@@ -1,55 +1,47 @@
-# RaMEALSdan
+# Iftar Lantern
 
-A mobile-friendly web app to help you pick a Ramadan meal combo:
+Iftar Lantern is a mobile-friendly Ramadan meal picker for:
 
 - Main course
 - Side dish
 - Dessert
 
-You can add your own dishes and generate randomized combinations without repetition until all combos are used.
+## No-repeat behavior
+
+Each category has its own no-repeat pool:
+
+- A selected main course will not repeat until all main courses are used.
+- A selected side dish will not repeat until all side dishes are used.
+- A selected dessert will not repeat until all desserts are used.
+
+When a category pool is exhausted, it automatically reshuffles and starts a new cycle.
 
 ## Features
 
 - Add and remove dishes per category
-- Save dishes locally on your device (`localStorage`)
-- Generate random combos with no repeats in a cycle
-- See how many combos are left
-- Reset cycle when all combos are used
+- Persist dishes and history locally (`localStorage`)
+- Generate randomized meal combos
+- Reset all no-repeat pools manually
 - Copy the latest combo text
+- Installable on iPhone home screen with offline support
 
 ## Run locally
 
-1. Open `index.html` in your browser.
-2. Use the app.
+Open `index.html` in a browser.
 
-## Use on your phone
+## Auto deploy to GitHub Pages
 
-### Option 1: GitHub Pages (recommended)
+This repo includes `.github/workflows/deploy-pages.yml` and deploys automatically on each push to `main`.
 
-1. Push this repo to GitHub.
-2. In GitHub repo settings, enable Pages:
-   - Source: `Deploy from a branch`
-   - Branch: `main` (root)
-3. Open your Pages URL on your phone (Safari).
-4. Tap `Share -> Add to Home Screen`.
-5. Open the installed app once while online to cache files for offline use.
+1. Go to repo settings -> Pages.
+2. Set **Source** to `GitHub Actions`.
+3. Push to `main`.
+4. Wait for the `Deploy Pages` workflow to finish.
+5. Open your Pages URL.
 
-### Option 2: Local network during development
+## iPhone install
 
-Run a local static server in this folder and open the LAN URL on your phone.
-
-Example:
-
-```bash
-python3 -m http.server 8080
-```
-
-Then open `http://<your-computer-ip>:8080`.
-
-## Offline/PWA notes
-
-- Includes a web app manifest.
-- Includes a service worker cache for app shell files.
-- Includes iPhone home-screen icon/meta tags.
-- After first successful load, core app files work offline.
-- Your dish data is still stored locally per device/browser via `localStorage`.
+1. Open your Pages URL in Safari.
+2. Tap `Share -> Add to Home Screen`.
+3. Open once while online to seed the cache.
+4. After that, core app files load offline.

@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1f6b5e" />
+    <meta name="theme-color" content="#081018" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="RaMEALSdan" />
-    <title>RaMEALSdan</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Iftar Lantern" />
+    <title>Iftar Lantern</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
@@ -23,16 +23,17 @@
   <body>
     <main class="app-shell">
       <header class="hero">
-        <p class="eyebrow">Ramadan meal picker</p>
-        <h1>RaMEALSdan</h1>
+        <p class="eyebrow">Ramadan planner</p>
+        <h1>Iftar Lantern</h1>
         <p class="subtitle">
-          Build your dish lists and get a random meal combo with no repetition.
+          Build dish lists and get random combos where each dish avoids repeating
+          until its full category pool is used.
         </p>
       </header>
 
       <section class="panel combo-panel">
         <div class="section-head">
-          <h2>Tonight's Combo</h2>
+          <h2>Tonight's Iftar Combo</h2>
           <p id="combo-stats" class="stats"></p>
         </div>
 
@@ -54,7 +55,7 @@
         <div class="actions">
           <button id="generate-btn" class="button primary">Generate Meal</button>
           <button id="copy-btn" class="button secondary">Copy Combo</button>
-          <button id="reset-cycle-btn" class="button ghost">Start New Cycle</button>
+          <button id="reset-cycle-btn" class="button ghost">Reset No-Repeat Pools</button>
         </div>
 
         <p id="status" class="status" aria-live="polite"></p>

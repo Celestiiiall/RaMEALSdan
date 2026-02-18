@@ -1,12 +1,12 @@
 {
-  "name": "RaMEALSdan",
-  "short_name": "RaMEALS",
-  "description": "Pick randomized Ramadan meal combos without repetition.",
+  "name": "Iftar Lantern",
+  "short_name": "Iftar",
+  "description": "Pick randomized Ramadan meal combos with no dish repeats until each category pool cycles.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f7ead5",
-  "theme_color": "#1f6b5e",
+  "background_color": "#081018",
+  "theme_color": "#081018",
   "icons": [
     {
       "src": "icons/icon-192.png",
