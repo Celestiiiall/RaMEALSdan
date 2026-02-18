@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1f6b5e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="RaMEALSdan" />
+    <title>RaMEALSdan</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">Ramadan meal picker</p>
+        <h1>RaMEALSdan</h1>
+        <p class="subtitle">
+          Build your dish lists and get a random meal combo with no repetition.
+        </p>
+      </header>
+
+      <section class="panel combo-panel">
+        <div class="section-head">
+          <h2>Tonight's Combo</h2>
+          <p id="combo-stats" class="stats"></p>
+        </div>
+
+        <div class="combo-grid">
+          <article class="combo-card">
+            <p>Main course</p>
+            <h3 id="main-output">-</h3>
+          </article>
+          <article class="combo-card">
+            <p>Side dish</p>
+            <h3 id="side-output">-</h3>
+          </article>
+          <article class="combo-card">
+            <p>Dessert</p>
+            <h3 id="dessert-output">-</h3>
+          </article>
+        </div>
+
+        <div class="actions">
+          <button id="generate-btn" class="button primary">Generate Meal</button>
+          <button id="copy-btn" class="button secondary">Copy Combo</button>
+          <button id="reset-cycle-btn" class="button ghost">Start New Cycle</button>
+        </div>
+
+        <p id="status" class="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <h2>Your Dishes</h2>
+          <p class="stats">Add your own meals for each category.</p>
+        </div>
+
+        <div class="lists-grid">
+          <article class="dish-column">
+            <h3>Main course</h3>
+            <form id="form-mains" class="dish-form">
+              <input
+                id="input-mains"
+                type="text"
+                placeholder="e.g. Chicken Biryani"
+                maxlength="60"
+                autocomplete="off"
+              />
+              <button type="submit" class="button tiny">Add</button>
+            </form>
+            <ul id="list-mains" class="dish-list"></ul>
+          </article>
+
+          <article class="dish-column">
+            <h3>Side dish</h3>
+            <form id="form-sides" class="dish-form">
+              <input
+                id="input-sides"
+                type="text"
+                placeholder="e.g. Samosa"
+                maxlength="60"
+                autocomplete="off"
+              />
+              <button type="submit" class="button tiny">Add</button>
+            </form>
+            <ul id="list-sides" class="dish-list"></ul>
+          </article>
+
+          <article class="dish-column">
+            <h3>Dessert</h3>
+            <form id="form-desserts" class="dish-form">
+              <input
+                id="input-desserts"
+                type="text"
+                placeholder="e.g. Kunafa"
+                maxlength="60"
+                autocomplete="off"
+              />
+              <button type="submit" class="button tiny">Add</button>
+            </form>
+            <ul id="list-desserts" class="dish-list"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <h2>Recent Picks</h2>
+          <button id="clear-history-btn" class="button ghost tiny-text">Clear</button>
+        </div>
+        <ol id="history-list" class="history-list"></ol>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

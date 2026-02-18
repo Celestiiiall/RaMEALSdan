@@ -1,0 +1,281 @@
+:root {
+  --bg: #f7ead5;
+  --panel: #fff9ef;
+  --ink: #2a211c;
+  --ink-soft: #6f5f54;
+  --brand: #1f6b5e;
+  --brand-dark: #18554a;
+  --accent: #cc7a31;
+  --line: #e5d5be;
+  --danger: #b33a2b;
+  --shadow: 0 12px 28px rgba(54, 38, 19, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 20%, rgba(204, 122, 49, 0.2), transparent 38%),
+    radial-gradient(circle at 95% 10%, rgba(31, 107, 94, 0.18), transparent 30%),
+    linear-gradient(165deg, #f9f0df 0%, var(--bg) 55%, #f2dfc4 100%);
+}
+
+.app-shell {
+  width: min(980px, 100% - 1.5rem);
+  margin: 1rem auto 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero {
+  padding: 1rem 0.4rem 0.4rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  color: var(--brand-dark);
+  font-weight: 600;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Fraunces", serif;
+  margin: 0;
+}
+
+h1 {
+  margin-top: 0.2rem;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.08;
+}
+
+.subtitle {
+  margin: 0.45rem 0 0;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0.95rem;
+  box-shadow: var(--shadow);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+
+.stats {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.combo-grid {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.combo-card {
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: linear-gradient(145deg, #fffef8, #fff4e4);
+}
+
+.combo-card p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.combo-card h3 {
+  margin-top: 0.35rem;
+  font-size: clamp(1.18rem, 4.8vw, 1.5rem);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.58rem 0.88rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.primary {
+  background: var(--brand);
+  color: #f4fff9;
+}
+
+.primary:hover {
+  background: var(--brand-dark);
+}
+
+.secondary {
+  background: #ffeac8;
+  color: #5b3418;
+}
+
+.ghost {
+  background: #f5ece0;
+  color: #534234;
+}
+
+.tiny {
+  padding: 0.45rem 0.65rem;
+}
+
+.tiny-text {
+  font-size: 0.83rem;
+}
+
+.status {
+  min-height: 1.35rem;
+  margin: 0.7rem 0 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.status.success {
+  color: var(--brand-dark);
+}
+
+.status.warn {
+  color: var(--danger);
+}
+
+.lists-grid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.dish-column {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.65rem;
+  background: #fffefa;
+}
+
+.dish-column h3 {
+  font-size: 1.15rem;
+}
+
+.dish-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+input {
+  font: inherit;
+  padding: 0.56rem 0.65rem;
+  border-radius: 9px;
+  border: 1px solid #d7c2a5;
+  outline: none;
+  background: #fffdf9;
+}
+
+input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(31, 107, 94, 0.2);
+}
+
+.dish-list,
+.history-list {
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.history-list {
+  list-style: decimal inside;
+}
+
+.dish-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.44rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #efdec5;
+  background: #fffdf8;
+}
+
+.remove-btn {
+  border: 0;
+  border-radius: 8px;
+  background: #ffe4de;
+  color: #7f281d;
+  cursor: pointer;
+  padding: 0.24rem 0.46rem;
+  font: inherit;
+}
+
+.empty {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  border: 1px dashed #dbc7aa;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.history-entry {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0.52rem 0.6rem;
+  background: #fffef9;
+}
+
+.history-meta {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+@media (min-width: 760px) {
+  .app-shell {
+    margin-top: 1.3rem;
+  }
+
+  .combo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lists-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
