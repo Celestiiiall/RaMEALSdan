@@ -61,22 +61,20 @@ body {
   width: clamp(68px, 13vw, 108px);
   aspect-ratio: 1;
   border-radius: 50%;
-  transform: rotate(-18deg);
-  background: radial-gradient(circle at 32% 38%, #fff8d9 0%, #f8de9f 45%, #d8aa5f 100%);
+  transform: rotate(-18deg) translateZ(0);
+  background: transparent;
   box-shadow:
-    0 0 26px rgba(255, 218, 133, 0.58),
-    0 0 56px rgba(255, 218, 133, 0.34);
+    -22px 0 0 4px rgba(251, 226, 158, 0.97),
+    -27px 0 0 8px rgba(214, 168, 82, 0.38),
+    -24px 0 36px 8px rgba(255, 218, 133, 0.44);
 }
 
-.moon::after {
+.moon::before {
   content: "";
   position: absolute;
-  top: 6%;
-  left: 47%;
-  width: 78%;
-  height: 88%;
+  inset: 22% 18% 20% 22%;
   border-radius: 50%;
-  background: #0b1626;
+  box-shadow: -7px 0 0 0 rgba(255, 243, 196, 0.68);
 }
 
 .star {

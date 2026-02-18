@@ -1,6 +1,6 @@
-# Iftar Lantern
+# Sufra
 
-Iftar Lantern is a mobile-friendly Ramadan meal picker for:
+Sufra is a mobile-friendly Ramadan meal picker for:
 
 - Main course
 - Side dish

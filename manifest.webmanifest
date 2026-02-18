@@ -1,6 +1,6 @@
 {
-  "name": "Iftar Lantern",
-  "short_name": "Iftar",
+  "name": "Sufra",
+  "short_name": "Sufra",
   "description": "Pick randomized Ramadan meal combos with no dish repeats until each category pool cycles.",
   "start_url": "./",
   "scope": "./",

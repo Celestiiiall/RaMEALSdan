@@ -1,4 +1,4 @@
-const APP_NAME = "Iftar Lantern";
+const APP_NAME = "Sufra";
 
 const CATEGORIES = [
   { id: "mains", label: "Main course", comboKey: "main" },
@@ -12,10 +12,10 @@ const DEFAULT_DISHES = {
   desserts: ["Kunafa", "Basbousa", "Date Cookies"],
 };
 
-const STORAGE_KEY = "iftar-lantern-state-v1";
-const LEGACY_STORAGE_KEYS = ["ramealsdan-state-v1"];
+const STORAGE_KEY = "sufra-state-v1";
+const LEGACY_STORAGE_KEYS = ["iftar-lantern-state-v1", "ramealsdan-state-v1"];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v5";
+const SW_VERSION = "v6";
 
 let state = loadState();
 
