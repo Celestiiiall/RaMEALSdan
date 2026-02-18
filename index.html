@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#081018" />
+    <meta name="color-scheme" content="dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Iftar Lantern" />
     <title>Iftar Lantern</title>
-    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="manifest" href="manifest.webmanifest?v=3" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
@@ -18,9 +19,20 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
+    <div class="night-scene" aria-hidden="true">
+      <span class="moon"></span>
+      <span class="star star-a"></span>
+      <span class="star star-b"></span>
+      <span class="star star-c"></span>
+      <span class="star star-d"></span>
+      <span class="star star-e"></span>
+      <span class="lantern lantern-left"><span class="lantern-glow"></span></span>
+      <span class="lantern lantern-mid"><span class="lantern-glow"></span></span>
+      <span class="lantern lantern-right"><span class="lantern-glow"></span></span>
+    </div>
     <main class="app-shell">
       <header class="hero">
         <p class="eyebrow">Ramadan planner</p>
@@ -124,6 +136,6 @@
       </section>
     </main>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=3"></script>
   </body>
 </html>

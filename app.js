@@ -15,6 +15,7 @@ const DEFAULT_DISHES = {
 const STORAGE_KEY = "iftar-lantern-state-v1";
 const LEGACY_STORAGE_KEYS = ["ramealsdan-state-v1"];
 const MAX_HISTORY = 30;
+const SW_VERSION = "v3";
 
 let state = loadState();
 
@@ -523,7 +524,7 @@ function registerServiceWorker() {
   }
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+    navigator.serviceWorker.register(`./service-worker.js?${SW_VERSION}`).catch((error) => {
       console.error("Service worker registration failed", error);
     });
   });

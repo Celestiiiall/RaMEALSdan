@@ -1,10 +1,10 @@
-const CACHE_NAME = "iftar-lantern-cache-v2";
+const CACHE_NAME = "iftar-lantern-cache-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./app.js",
-  "./manifest.webmanifest",
+  "./styles.css?v=3",
+  "./app.js?v=3",
+  "./manifest.webmanifest?v=3",
   "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

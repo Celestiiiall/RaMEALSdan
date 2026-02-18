@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg-top: #081018;
   --bg-bottom: #101a2a;
   --panel: rgba(12, 25, 40, 0.82);
@@ -22,6 +23,8 @@ body {
   min-height: 100vh;
   font-family: "Space Grotesk", sans-serif;
   color: var(--ink);
+  position: relative;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 50% -12%, rgba(227, 179, 79, 0.22), transparent 34%),
     radial-gradient(circle at 10% 25%, rgba(45, 139, 126, 0.2), transparent 38%),
@@ -34,10 +37,145 @@ body {
   margin: 1rem auto 2rem;
   display: grid;
   gap: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.night-scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 230px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.moon {
+  position: absolute;
+  top: 32px;
+  right: 12%;
+  width: clamp(62px, 12vw, 94px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3c3 0%, #f0ce84 48%, #c89a4f 100%);
+  box-shadow:
+    0 0 22px rgba(255, 218, 133, 0.55),
+    0 0 46px rgba(255, 218, 133, 0.3);
+}
+
+.moon::after {
+  content: "";
+  position: absolute;
+  inset: 10% 14% 14% 40%;
+  border-radius: 50%;
+  background: #111b2b;
+}
+
+.star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffefc5;
+  box-shadow: 0 0 8px rgba(255, 231, 168, 0.8);
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+.star-a {
+  top: 40px;
+  left: 20%;
+}
+
+.star-b {
+  top: 82px;
+  left: 30%;
+  animation-delay: 0.4s;
+}
+
+.star-c {
+  top: 58px;
+  left: 63%;
+  animation-delay: 0.8s;
+}
+
+.star-d {
+  top: 110px;
+  left: 76%;
+  animation-delay: 1.2s;
+}
+
+.star-e {
+  top: 36px;
+  left: 48%;
+  animation-delay: 1.6s;
+}
+
+.lantern {
+  position: absolute;
+  top: -2px;
+  width: 40px;
+  height: 145px;
+  transform-origin: center top;
+  animation: swing 5.4s ease-in-out infinite;
+}
+
+.lantern::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 19px;
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(to bottom, rgba(225, 180, 85, 0.8), rgba(225, 180, 85, 0.3));
+}
+
+.lantern::after {
+  content: "";
+  position: absolute;
+  top: 60px;
+  left: 6px;
+  width: 28px;
+  height: 42px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 223, 138, 0.62);
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(249, 202, 98, 0.2) 0 4px,
+      rgba(35, 74, 96, 0.8) 4px 8px
+    ),
+    linear-gradient(145deg, rgba(250, 201, 102, 0.85), rgba(185, 126, 40, 0.9));
+  box-shadow: 0 0 18px rgba(255, 199, 94, 0.32);
+}
+
+.lantern-glow {
+  position: absolute;
+  top: 68px;
+  left: -12px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 212, 125, 0.38) 0%, rgba(255, 212, 125, 0) 70%);
+}
+
+.lantern-left {
+  left: 8%;
+  animation-delay: 0s;
+}
+
+.lantern-mid {
+  left: 44%;
+  animation-delay: 0.9s;
+}
+
+.lantern-right {
+  right: 10%;
+  animation-delay: 1.6s;
 }
 
 .hero {
-  padding: 1rem 0.4rem 0.5rem;
+  padding: 1.25rem 0.4rem 0.5rem;
 }
 
 .eyebrow {
@@ -75,6 +213,17 @@ h1 {
   padding: 0.95rem;
   box-shadow: var(--shadow);
   backdrop-filter: blur(6px);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(227, 179, 79, 0.08);
 }
 
 .section-head {
@@ -255,6 +404,11 @@ input:focus {
   font: inherit;
 }
 
+.button:hover,
+.remove-btn:hover {
+  filter: brightness(1.06);
+}
+
 .empty {
   color: var(--ink-soft);
   font-size: 0.9rem;
@@ -288,5 +442,27 @@ input:focus {
 
   .lists-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@keyframes swing {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
   }
 }
