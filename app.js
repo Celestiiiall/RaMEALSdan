@@ -15,7 +15,7 @@ const DEFAULT_DISHES = {
 const STORAGE_KEY = "sufra-state-v1";
 const LEGACY_STORAGE_KEYS = ["iftar-lantern-state-v1", "ramealsdan-state-v1"];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v6";
+const SW_VERSION = "v8";
 
 let state = loadState();
 
@@ -355,7 +355,7 @@ function pullRandomDish(categoryId) {
     return "";
   }
 
-  const randomIndex = Math.floor(Math.random() * pool.length);
+  const randomIndex = randomInt(pool.length);
   const [dish] = pool.splice(randomIndex, 1);
   return dish;
 }
@@ -501,7 +501,7 @@ function escapeHtml(text) {
 }
 
 function insertAtRandom(list, value) {
-  const index = Math.floor(Math.random() * (list.length + 1));
+  const index = randomInt(list.length + 1);
   list.splice(index, 0, value);
 }
 
@@ -513,9 +513,29 @@ function makeShuffledPool(items) {
 
 function shuffleInPlace(items) {
   for (let i = items.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = randomInt(i + 1);
     [items[i], items[j]] = [items[j], items[i]];
   }
+}
+
+function randomInt(maxExclusive) {
+  if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
+    return 0;
+  }
+
+  if (window.crypto?.getRandomValues) {
+    const maxUint32 = 0xffffffff;
+    const limit = maxUint32 - ((maxUint32 + 1) % maxExclusive);
+    const buffer = new Uint32Array(1);
+
+    do {
+      window.crypto.getRandomValues(buffer);
+    } while (buffer[0] > limit);
+
+    return buffer[0] % maxExclusive;
+  }
+
+  return Math.floor(Math.random() * maxExclusive);
 }
 
 function registerServiceWorker() {

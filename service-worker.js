@@ -1,10 +1,10 @@
-const CACHE_NAME = "sufra-cache-v6";
+const CACHE_NAME = "sufra-cache-v8";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=6",
-  "./app.js?v=6",
-  "./manifest.webmanifest?v=6",
+  "./styles.css?v=8",
+  "./app.js?v=8",
+  "./manifest.webmanifest?v=8",
   "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

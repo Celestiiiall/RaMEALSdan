@@ -64,17 +64,12 @@ body {
   transform: rotate(-18deg) translateZ(0);
   background: transparent;
   box-shadow:
-    -22px 0 0 4px rgba(251, 226, 158, 0.97),
-    -27px 0 0 8px rgba(214, 168, 82, 0.38),
+    -22px 0 0 5px rgba(251, 226, 158, 0.97),
     -24px 0 36px 8px rgba(255, 218, 133, 0.44);
 }
 
 .moon::before {
-  content: "";
-  position: absolute;
-  inset: 22% 18% 20% 22%;
-  border-radius: 50%;
-  box-shadow: -7px 0 0 0 rgba(255, 243, 196, 0.68);
+  content: none;
 }
 
 .star {
