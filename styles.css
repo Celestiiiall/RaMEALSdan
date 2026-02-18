@@ -39,6 +39,9 @@ body {
   gap: 1rem;
   position: relative;
   z-index: 2;
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
 .night-scene {
@@ -274,6 +277,7 @@ h1 {
   border: 0;
   border-radius: 10px;
   padding: 0.58rem 0.88rem;
+  min-height: 44px;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -400,7 +404,8 @@ input:focus {
   background: rgba(150, 38, 57, 0.3);
   color: #ffc4ce;
   cursor: pointer;
-  padding: 0.24rem 0.46rem;
+  padding: 0.26rem 0.52rem;
+  min-height: 36px;
   font: inherit;
 }
 
@@ -431,7 +436,50 @@ input:focus {
   margin-top: 0.2rem;
 }
 
-@media (min-width: 760px) {
+@media (min-width: 760px) and (max-width: 1199px) {
+  .app-shell {
+    width: min(1120px, 100% - 2.2rem);
+    margin-top: 1.2rem;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .hero {
+    grid-column: 1 / -1;
+  }
+
+  .combo-panel {
+    grid-column: 1 / -1;
+  }
+
+  .dishes-panel {
+    grid-column: 1 / 9;
+  }
+
+  .history-panel {
+    grid-column: 9 / -1;
+    align-self: start;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .lists-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dishes-panel .dish-column:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .combo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .night-scene {
+    height: 270px;
+  }
+}
+
+@media (min-width: 1200px) {
   .app-shell {
     margin-top: 1.3rem;
   }
