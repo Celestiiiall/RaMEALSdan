@@ -15,7 +15,7 @@ const DEFAULT_DISHES = {
 const STORAGE_KEY = "iftar-lantern-state-v1";
 const LEGACY_STORAGE_KEYS = ["ramealsdan-state-v1"];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v4";
+const SW_VERSION = "v5";
 
 let state = loadState();
 

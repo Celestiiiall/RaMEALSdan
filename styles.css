@@ -56,23 +56,27 @@ body {
 
 .moon {
   position: absolute;
-  top: 32px;
-  right: 12%;
-  width: clamp(62px, 12vw, 94px);
+  top: 26px;
+  right: 11%;
+  width: clamp(68px, 13vw, 108px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff3c3 0%, #f0ce84 48%, #c89a4f 100%);
+  transform: rotate(-18deg);
+  background: radial-gradient(circle at 32% 38%, #fff8d9 0%, #f8de9f 45%, #d8aa5f 100%);
   box-shadow:
-    0 0 22px rgba(255, 218, 133, 0.55),
-    0 0 46px rgba(255, 218, 133, 0.3);
+    0 0 26px rgba(255, 218, 133, 0.58),
+    0 0 56px rgba(255, 218, 133, 0.34);
 }
 
 .moon::after {
   content: "";
   position: absolute;
-  inset: 10% 14% 14% 40%;
+  top: 6%;
+  left: 47%;
+  width: 78%;
+  height: 88%;
   border-radius: 50%;
-  background: #111b2b;
+  background: #0b1626;
 }
 
 .star {
