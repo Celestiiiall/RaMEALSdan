@@ -15,8 +15,8 @@
     </radialGradient>
     <mask id="crescent">
       <rect width="512" height="512" fill="black"/>
-      <circle cx="306" cy="232" r="124" fill="white"/>
-      <circle cx="370" cy="200" r="112" fill="black"/>
+      <circle cx="276" cy="220" r="124" fill="white"/>
+      <circle cx="340" cy="188" r="112" fill="black"/>
     </mask>
   </defs>
 
@@ -33,5 +33,5 @@
     <circle cx="302" cy="84" r="2.4"/>
   </g>
 
-  <circle cx="306" cy="232" r="124" fill="url(#moon)" mask="url(#crescent)"/>
+  <circle cx="276" cy="220" r="124" fill="url(#moon)" mask="url(#crescent)"/>
 </svg>
