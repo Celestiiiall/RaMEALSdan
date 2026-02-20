@@ -1,14 +1,14 @@
-const CACHE_NAME = "sufra-cache-v9";
+const CACHE_NAME = "sufra-cache-v11";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=9",
-  "./app.js?v=9",
-  "./manifest.webmanifest?v=9",
-  "./icons/icon.svg",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/apple-touch-icon.png",
+  "./styles.css?v=11",
+  "./app.js?v=11",
+  "./manifest.webmanifest?v=11",
+  "./icons/icon.svg?v=11",
+  "./icons/icon-192.png?v=11",
+  "./icons/icon-512.png?v=11",
+  "./icons/apple-touch-icon.png?v=11",
 ];
 
 self.addEventListener("install", (event) => {
