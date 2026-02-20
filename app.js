@@ -49,7 +49,7 @@ const DEFAULT_DISHES = {
 const STORAGE_KEY = "sufra-state-v2";
 const LEGACY_STORAGE_KEYS = ["sufra-state-v1", "iftar-lantern-state-v1", "ramealsdan-state-v1"];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v13";
+const SW_VERSION = "v14";
 
 let state = loadState();
 
