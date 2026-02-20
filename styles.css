@@ -260,7 +260,43 @@ h1 {
 
 .combo-card h3 {
   margin-top: 0.35rem;
-  font-size: clamp(1.2rem, 4.8vw, 1.55rem);
+  line-height: 1.3;
+  font-size: clamp(1.02rem, 3.6vw, 1.24rem);
+  min-height: 2.7em;
+}
+
+.serving-panel {
+  margin-top: 0.82rem;
+  padding: 0.66rem 0.72rem;
+  border: 1px solid rgba(132, 173, 214, 0.26);
+  border-radius: 12px;
+  background: rgba(9, 21, 36, 0.7);
+}
+
+.serving-title {
+  margin: 0 0 0.5rem;
+  color: #b9cbe0;
+  font-size: 0.9rem;
+}
+
+.serving-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.52rem;
+}
+
+.serving-control {
+  display: grid;
+  gap: 0.3rem;
+  color: #cedcf1;
+  font-size: 0.84rem;
+}
+
+.count-input {
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  padding-block: 0.46rem;
 }
 
 .actions {
@@ -433,6 +469,20 @@ input:focus {
   margin-top: 0.2rem;
 }
 
+.history-chunk strong {
+  color: #e8bb61;
+}
+
+.history-sep {
+  color: #7f96b2;
+}
+
+@media (max-width: 520px) {
+  .serving-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (min-width: 760px) and (max-width: 1199px) {
   .app-shell {
     width: min(1120px, 100% - 2.2rem);
@@ -463,12 +513,8 @@ input:focus {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dishes-panel .dish-column:last-child {
-    grid-column: 1 / -1;
-  }
-
   .combo-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .night-scene {
@@ -482,11 +528,15 @@ input:focus {
   }
 
   .combo-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .lists-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .serving-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sufra" />
     <title>Sufra</title>
-    <link rel="manifest" href="manifest.webmanifest?v=8" />
+    <link rel="manifest" href="manifest.webmanifest?v=9" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=8" />
+    <link rel="stylesheet" href="styles.css?v=9" />
   </head>
   <body>
     <div class="night-scene" aria-hidden="true">
@@ -38,8 +38,9 @@
         <p class="eyebrow">Ramadan planner</p>
         <h1>Sufra</h1>
         <p class="subtitle">
-          Build dish lists and get random combos where each dish avoids repeating
-          until its full category pool is used.
+          Build dish lists, choose how many items you want per category, and get
+          random combos where each dish avoids repeating until its category pool
+          is used.
         </p>
       </header>
 
@@ -51,17 +52,50 @@
 
         <div class="combo-grid">
           <article class="combo-card">
-            <p>Main course</p>
-            <h3 id="main-output">-</h3>
+            <p>Main courses</p>
+            <h3 id="output-mains">-</h3>
           </article>
           <article class="combo-card">
-            <p>Side dish</p>
-            <h3 id="side-output">-</h3>
+            <p>Side dishes</p>
+            <h3 id="output-sides">-</h3>
           </article>
           <article class="combo-card">
-            <p>Dessert</p>
-            <h3 id="dessert-output">-</h3>
+            <p>Desserts</p>
+            <h3 id="output-desserts">-</h3>
           </article>
+          <article class="combo-card">
+            <p>Soups</p>
+            <h3 id="output-soups">-</h3>
+          </article>
+        </div>
+
+        <div class="serving-panel">
+          <p class="serving-title">How many from each category?</p>
+          <div class="serving-grid">
+            <label class="serving-control" for="count-mains">
+              Main courses
+              <input id="count-mains" class="count-input" type="number" min="1" max="6" step="1" />
+            </label>
+            <label class="serving-control" for="count-sides">
+              Side dishes
+              <input id="count-sides" class="count-input" type="number" min="1" max="6" step="1" />
+            </label>
+            <label class="serving-control" for="count-desserts">
+              Desserts
+              <input
+                id="count-desserts"
+                class="count-input"
+                type="number"
+                min="1"
+                max="6"
+                step="1"
+              />
+            </label>
+            <label class="serving-control" for="count-soups">
+              Soups
+              <input id="count-soups" class="count-input" type="number" min="0" max="6" step="1" />
+            </label>
+          </div>
         </div>
 
         <div class="actions">
@@ -76,12 +110,12 @@
       <section class="panel dishes-panel">
         <div class="section-head">
           <h2>Your Dishes</h2>
-          <p class="stats">Add your own meals for each category.</p>
+          <p class="stats">Add your own meals for each category, including soups.</p>
         </div>
 
         <div class="lists-grid">
           <article class="dish-column">
-            <h3>Main course</h3>
+            <h3>Main courses</h3>
             <form id="form-mains" class="dish-form">
               <input
                 id="input-mains"
@@ -96,7 +130,7 @@
           </article>
 
           <article class="dish-column">
-            <h3>Side dish</h3>
+            <h3>Side dishes</h3>
             <form id="form-sides" class="dish-form">
               <input
                 id="input-sides"
@@ -111,7 +145,7 @@
           </article>
 
           <article class="dish-column">
-            <h3>Dessert</h3>
+            <h3>Desserts</h3>
             <form id="form-desserts" class="dish-form">
               <input
                 id="input-desserts"
@@ -123,6 +157,21 @@
               <button type="submit" class="button tiny">Add</button>
             </form>
             <ul id="list-desserts" class="dish-list"></ul>
+          </article>
+
+          <article class="dish-column">
+            <h3>Soups</h3>
+            <form id="form-soups" class="dish-form">
+              <input
+                id="input-soups"
+                type="text"
+                placeholder="e.g. Harira"
+                maxlength="60"
+                autocomplete="off"
+              />
+              <button type="submit" class="button tiny">Add</button>
+            </form>
+            <ul id="list-soups" class="dish-list"></ul>
           </article>
         </div>
       </section>
@@ -136,6 +185,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
   </body>
 </html>

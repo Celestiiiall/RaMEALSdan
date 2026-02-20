@@ -1,34 +1,73 @@
 const APP_NAME = "Sufra";
 
 const CATEGORIES = [
-  { id: "mains", label: "Main course", comboKey: "main" },
-  { id: "sides", label: "Side dish", comboKey: "side" },
-  { id: "desserts", label: "Dessert", comboKey: "dessert" },
+  {
+    id: "mains",
+    label: "Main courses",
+    singular: "main course",
+    legacyComboKey: "main",
+    minServings: 1,
+    maxServings: 6,
+    defaultServings: 1,
+  },
+  {
+    id: "sides",
+    label: "Side dishes",
+    singular: "side dish",
+    legacyComboKey: "side",
+    minServings: 1,
+    maxServings: 6,
+    defaultServings: 1,
+  },
+  {
+    id: "desserts",
+    label: "Desserts",
+    singular: "dessert",
+    legacyComboKey: "dessert",
+    minServings: 1,
+    maxServings: 6,
+    defaultServings: 1,
+  },
+  {
+    id: "soups",
+    label: "Soups",
+    singular: "soup",
+    legacyComboKey: "soup",
+    minServings: 0,
+    maxServings: 6,
+    defaultServings: 1,
+  },
 ];
 
 const DEFAULT_DISHES = {
-  mains: ["Chicken Biryani", "Lamb Kofta", "Lentil Soup"],
+  mains: ["Chicken Biryani", "Lamb Kofta", "Mandi Rice"],
   sides: ["Samosa", "Fattoush Salad", "Garlic Bread"],
   desserts: ["Kunafa", "Basbousa", "Date Cookies"],
+  soups: ["Harira", "Lentil Soup", "Tomato Soup"],
 };
 
-const STORAGE_KEY = "sufra-state-v1";
-const LEGACY_STORAGE_KEYS = ["iftar-lantern-state-v1", "ramealsdan-state-v1"];
+const STORAGE_KEY = "sufra-state-v2";
+const LEGACY_STORAGE_KEYS = ["sufra-state-v1", "iftar-lantern-state-v1", "ramealsdan-state-v1"];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v8";
+const SW_VERSION = "v9";
 
 let state = loadState();
 
 const comboStatsEl = document.getElementById("combo-stats");
 const statusEl = document.getElementById("status");
-const mainOutputEl = document.getElementById("main-output");
-const sideOutputEl = document.getElementById("side-output");
-const dessertOutputEl = document.getElementById("dessert-output");
 const historyListEl = document.getElementById("history-list");
 const generateBtn = document.getElementById("generate-btn");
 const copyBtn = document.getElementById("copy-btn");
 const resetCycleBtn = document.getElementById("reset-cycle-btn");
 const clearHistoryBtn = document.getElementById("clear-history-btn");
+
+const outputEls = Object.fromEntries(
+  CATEGORIES.map((category) => [category.id, document.getElementById(`output-${category.id}`)]),
+);
+
+const countInputs = Object.fromEntries(
+  CATEGORIES.map((category) => [category.id, document.getElementById(`count-${category.id}`)]),
+);
 
 wireEvents();
 render();
@@ -39,6 +78,11 @@ function wireEvents() {
     const form = document.getElementById(`form-${category.id}`);
     const input = document.getElementById(`input-${category.id}`);
     const list = document.getElementById(`list-${category.id}`);
+    const countInput = countInputs[category.id];
+
+    if (!form || !input || !list || !countInput) {
+      continue;
+    }
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -56,6 +100,10 @@ function wireEvents() {
       const index = Number(button.dataset.index);
       removeDish(category.id, index);
     });
+
+    countInput.addEventListener("change", () => {
+      updateServings(category.id, countInput.value);
+    });
   }
 
   generateBtn.addEventListener("click", generateCombo);
@@ -65,19 +113,20 @@ function wireEvents() {
 }
 
 function createDefaultState() {
-  const dishes = {
-    mains: [...DEFAULT_DISHES.mains],
-    sides: [...DEFAULT_DISHES.sides],
-    desserts: [...DEFAULT_DISHES.desserts],
-  };
+  const dishes = {};
+  const servings = {};
+  const cyclePools = {};
+
+  for (const category of CATEGORIES) {
+    dishes[category.id] = [...DEFAULT_DISHES[category.id]];
+    servings[category.id] = category.defaultServings;
+    cyclePools[category.id] = makeShuffledPool(dishes[category.id]);
+  }
 
   return {
     dishes,
-    cyclePools: {
-      mains: makeShuffledPool(dishes.mains),
-      sides: makeShuffledPool(dishes.sides),
-      desserts: makeShuffledPool(dishes.desserts),
-    },
+    servings,
+    cyclePools,
     lastCombo: null,
     history: [],
   };
@@ -92,27 +141,29 @@ function loadState() {
 
   const loaded = {
     ...defaultState,
-    dishes: { ...defaultState.dishes },
-    cyclePools: { mains: [], sides: [], desserts: [] },
+    dishes: {},
+    servings: {},
+    cyclePools: {},
     lastCombo: null,
     history: [],
   };
 
   for (const category of CATEGORIES) {
     const candidateDishes = loadedRaw?.dishes?.[category.id];
-    if (Array.isArray(candidateDishes)) {
-      loaded.dishes[category.id] = cleanDishArray(candidateDishes);
-    }
+    loaded.dishes[category.id] = Array.isArray(candidateDishes)
+      ? cleanDishArray(candidateDishes)
+      : [...defaultState.dishes[category.id]];
+
+    const candidateServings = loadedRaw?.servings?.[category.id];
+    loaded.servings[category.id] = clampServings(category, candidateServings);
+
+    const candidatePool = loadedRaw?.cyclePools?.[category.id];
+    loaded.cyclePools[category.id] = Array.isArray(candidatePool)
+      ? normalizePool(candidatePool, loaded.dishes[category.id])
+      : [];
   }
 
-  for (const category of CATEGORIES) {
-    const candidatePool = loadedRaw?.cyclePools?.[category.id];
-    if (Array.isArray(candidatePool)) {
-      loaded.cyclePools[category.id] = normalizePool(candidatePool, loaded.dishes[category.id]);
-    } else {
-      loaded.cyclePools[category.id] = [];
-    }
-  }
+  loaded.lastCombo = normalizeCombo(loadedRaw?.lastCombo, loaded.dishes);
 
   if (Array.isArray(loadedRaw?.history)) {
     loaded.history = loadedRaw.history
@@ -120,8 +171,6 @@ function loadState() {
       .filter((entry) => entry !== null)
       .slice(0, MAX_HISTORY);
   }
-
-  loaded.lastCombo = normalizeCombo(loadedRaw?.lastCombo, loaded.dishes);
 
   reconcileState(loaded);
   return loaded;
@@ -160,16 +209,17 @@ function addDish(categoryId, rawName) {
     (dish) => dish.toLowerCase() === name.toLowerCase(),
   );
   if (exists) {
-    setStatus(`"${name}" is already in ${categoryLabel(categoryId)}.`, "warn");
+    setStatus(`"${name}" is already in ${categoryById(categoryId).label.toLowerCase()}.`, "warn");
     return;
   }
 
   state.dishes[categoryId].push(name);
   insertAtRandom(state.cyclePools[categoryId], name);
+
   reconcileState(state);
   saveState();
   render();
-  setStatus(`Added "${name}" to ${categoryLabel(categoryId)}.`, "success");
+  setStatus(`Added "${name}" to ${categoryById(categoryId).label.toLowerCase()}.`, "success");
 }
 
 function removeDish(categoryId, index) {
@@ -184,32 +234,43 @@ function removeDish(categoryId, index) {
 
   const [removed] = list.splice(index, 1);
   state.cyclePools[categoryId] = state.cyclePools[categoryId].filter((item) => item !== removed);
+
   reconcileState(state);
   saveState();
   render();
-  setStatus(`Removed "${removed}" from ${categoryLabel(categoryId)}.`, "success");
+  setStatus(`Removed "${removed}" from ${categoryById(categoryId).label.toLowerCase()}.`, "success");
+}
+
+function updateServings(categoryId, rawValue) {
+  const category = categoryById(categoryId);
+  const nextValue = clampServings(category, rawValue);
+
+  state.servings[categoryId] = nextValue;
+
+  saveState();
+  render();
+
+  const noun = nextValue === 1 ? category.singular : category.label.toLowerCase();
+  setStatus(`Set ${nextValue} ${noun} per combo.`, "success");
 }
 
 function generateCombo() {
-  const missing = CATEGORIES.filter((cat) => state.dishes[cat.id].length === 0).map(
-    (cat) => cat.label,
-  );
+  const required = CATEGORIES.filter((category) => state.servings[category.id] > 0);
+  const missing = required
+    .filter((category) => state.dishes[category.id].length === 0)
+    .map((category) => category.label);
+
   if (missing.length > 0) {
     setStatus(`Add at least one dish in: ${missing.join(", ")}.`, "warn");
     return;
   }
 
-  const restartedPools = [];
-  for (const category of CATEGORIES) {
-    if (state.cyclePools[category.id].length === 0) {
-      state.cyclePools[category.id] = makeShuffledPool(state.dishes[category.id]);
-      restartedPools.push(category.label);
-    }
-  }
-
+  const restartedPools = new Set();
   const combo = {};
+
   for (const category of CATEGORIES) {
-    combo[category.comboKey] = pullRandomDish(category.id);
+    const desiredCount = state.servings[category.id];
+    combo[category.id] = drawDishesForCategory(category.id, desiredCount, restartedPools);
   }
 
   state.lastCombo = combo;
@@ -221,11 +282,56 @@ function generateCombo() {
 
   const poolStats = getPoolStats();
   let message = "Meal generated.";
-  if (restartedPools.length > 0) {
-    message += ` New no-repeat pool started for ${restartedPools.join(", ")}.`;
+  if (restartedPools.size > 0) {
+    const labels = [...restartedPools].map((categoryId) => categoryById(categoryId).label.toLowerCase());
+    message += ` New no-repeat cycle started for ${labels.join(", ")}.`;
   }
-  message += ` Remaining before repeat: main ${poolStats.mains}, side ${poolStats.sides}, dessert ${poolStats.desserts}.`;
+  message += ` Remaining before repeat: ${poolStats}.`;
   setStatus(message, "success");
+}
+
+function drawDishesForCategory(categoryId, desiredCount, restartedPools) {
+  const picks = [];
+  if (desiredCount <= 0) {
+    return picks;
+  }
+
+  const dishes = state.dishes[categoryId];
+  if (dishes.length === 0) {
+    return picks;
+  }
+
+  const pickedInCurrentCombo = new Set();
+
+  while (picks.length < desiredCount) {
+    if (state.cyclePools[categoryId].length === 0) {
+      state.cyclePools[categoryId] = makeShuffledPool(dishes);
+      restartedPools.add(categoryId);
+    }
+
+    const pool = state.cyclePools[categoryId];
+    const avoidDuplicatesThisCombo = pickedInCurrentCombo.size < dishes.length;
+    let candidateIndices = [];
+
+    if (avoidDuplicatesThisCombo) {
+      candidateIndices = pool
+        .map((dish, index) => ({ dish, index }))
+        .filter((entry) => !pickedInCurrentCombo.has(entry.dish.toLowerCase()))
+        .map((entry) => entry.index);
+    }
+
+    if (candidateIndices.length === 0) {
+      candidateIndices = pool.map((_, index) => index);
+    }
+
+    const chosenIndex = candidateIndices[randomInt(candidateIndices.length)];
+    const [dish] = pool.splice(chosenIndex, 1);
+
+    picks.push(dish);
+    pickedInCurrentCombo.add(dish.toLowerCase());
+  }
+
+  return picks;
 }
 
 function copyCombo() {
@@ -234,12 +340,15 @@ function copyCombo() {
     return;
   }
 
-  const text = [
-    `${APP_NAME} pick:`,
-    `Main course: ${state.lastCombo.main}`,
-    `Side dish: ${state.lastCombo.side}`,
-    `Dessert: ${state.lastCombo.dessert}`,
-  ].join("\n");
+  const lines = [`${APP_NAME} pick:`];
+  for (const category of CATEGORIES) {
+    const picks = state.lastCombo[category.id] || [];
+    if (picks.length === 0) {
+      lines.push(`${category.label}: Not included`);
+      continue;
+    }
+    lines.push(`${category.label}: ${picks.join(", ")}`);
+  }
 
   if (!navigator.clipboard?.writeText) {
     setStatus("Clipboard is not available in this browser.", "warn");
@@ -247,7 +356,7 @@ function copyCombo() {
   }
 
   navigator.clipboard
-    .writeText(text)
+    .writeText(lines.join("\n"))
     .then(() => setStatus("Combo copied to clipboard.", "success"))
     .catch(() => setStatus("Could not copy combo. Try again.", "warn"));
 }
@@ -277,13 +386,13 @@ function clearHistory() {
 function render() {
   for (const category of CATEGORIES) {
     renderCategoryList(category.id);
+    renderServingInput(category.id);
   }
 
   renderComboCard();
   renderHistory();
 
-  const stats = getPoolStats();
-  comboStatsEl.textContent = `Before repeat: main ${stats.mains}, side ${stats.sides}, dessert ${stats.desserts}`;
+  comboStatsEl.textContent = `Before repeat: ${getPoolStats()}`;
 }
 
 function renderCategoryList(categoryId) {
@@ -311,10 +420,29 @@ function renderCategoryList(categoryId) {
     .join("");
 }
 
+function renderServingInput(categoryId) {
+  const input = countInputs[categoryId];
+  if (!input) {
+    return;
+  }
+  input.value = String(state.servings[categoryId]);
+}
+
 function renderComboCard() {
-  mainOutputEl.textContent = state.lastCombo?.main || "-";
-  sideOutputEl.textContent = state.lastCombo?.side || "-";
-  dessertOutputEl.textContent = state.lastCombo?.dessert || "-";
+  for (const category of CATEGORIES) {
+    const outputEl = outputEls[category.id];
+    if (!outputEl) {
+      continue;
+    }
+    const picks = state.lastCombo?.[category.id] || [];
+
+    if (picks.length === 0) {
+      outputEl.textContent = state.servings[category.id] === 0 ? "Not included" : "-";
+      continue;
+    }
+
+    outputEl.textContent = picks.join(" • ");
+  }
 }
 
 function renderHistory() {
@@ -326,14 +454,28 @@ function renderHistory() {
   historyListEl.innerHTML = state.history
     .map((entry) => {
       const timestamp = formatTimestamp(entry.at);
+      const parts = CATEGORIES
+        .map((category) => formatHistoryChunk(category, entry[category.id] || []))
+        .filter((chunk) => chunk !== "");
+
       return `
         <li class="history-entry">
-          ${escapeHtml(entry.main)} + ${escapeHtml(entry.side)} + ${escapeHtml(entry.dessert)}
+          ${parts.join('<span class="history-sep"> | </span>')}
           <span class="history-meta">${timestamp}</span>
         </li>
       `;
     })
     .join("");
+}
+
+function formatHistoryChunk(category, picks) {
+  if (!Array.isArray(picks) || picks.length === 0) {
+    return "";
+  }
+
+  return `<span class="history-chunk"><strong>${escapeHtml(category.label)}:</strong> ${picks
+    .map((item) => escapeHtml(item))
+    .join(", ")}</span>`;
 }
 
 function setStatus(message, tone = "") {
@@ -342,27 +484,15 @@ function setStatus(message, tone = "") {
 }
 
 function getPoolStats() {
-  return {
-    mains: state.cyclePools.mains.length,
-    sides: state.cyclePools.sides.length,
-    desserts: state.cyclePools.desserts.length,
-  };
-}
-
-function pullRandomDish(categoryId) {
-  const pool = state.cyclePools[categoryId];
-  if (pool.length === 0) {
-    return "";
-  }
-
-  const randomIndex = randomInt(pool.length);
-  const [dish] = pool.splice(randomIndex, 1);
-  return dish;
+  return CATEGORIES.map((category) => `${category.singular} ${state.cyclePools[category.id].length}`).join(
+    ", ",
+  );
 }
 
 function reconcileState(target) {
   for (const category of CATEGORIES) {
     target.dishes[category.id] = cleanDishArray(target.dishes[category.id] || []);
+    target.servings[category.id] = clampServings(category, target.servings[category.id]);
   }
 
   for (const category of CATEGORIES) {
@@ -383,6 +513,63 @@ function reconcileState(target) {
     .slice(0, MAX_HISTORY);
 }
 
+function normalizeHistoryEntry(entry, dishes) {
+  const combo = normalizeCombo(entry, dishes);
+  if (!combo) {
+    return null;
+  }
+
+  return {
+    ...combo,
+    at: typeof entry.at === "string" ? entry.at : new Date().toISOString(),
+  };
+}
+
+function normalizeCombo(rawCombo, dishes) {
+  if (!rawCombo || typeof rawCombo !== "object") {
+    return null;
+  }
+
+  const combo = {};
+  let hasAny = false;
+
+  for (const category of CATEGORIES) {
+    const candidate = rawCombo[category.id] ?? rawCombo[category.legacyComboKey];
+    let items = [];
+
+    if (Array.isArray(candidate)) {
+      items = normalizeComboItems(candidate, dishes[category.id]);
+    } else if (typeof candidate === "string") {
+      items = normalizeComboItems([candidate], dishes[category.id]);
+    }
+
+    combo[category.id] = items;
+    if (items.length > 0) {
+      hasAny = true;
+    }
+  }
+
+  return hasAny ? combo : null;
+}
+
+function normalizeComboItems(items, options) {
+  const output = [];
+  const seen = new Set();
+
+  for (const item of items) {
+    const canonical = canonicalDishName(item, options);
+    const key = canonical.toLowerCase();
+    if (!canonical || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    output.push(canonical);
+  }
+
+  return output;
+}
+
 function normalizePool(pool, validDishes) {
   const map = new Map(validDishes.map((dish) => [dish.toLowerCase(), dish]));
   const seen = new Set();
@@ -399,34 +586,6 @@ function normalizePool(pool, validDishes) {
   }
 
   return cleaned;
-}
-
-function normalizeHistoryEntry(entry, dishes) {
-  const combo = normalizeCombo(entry, dishes);
-  if (!combo) {
-    return null;
-  }
-
-  return {
-    ...combo,
-    at: typeof entry.at === "string" ? entry.at : new Date().toISOString(),
-  };
-}
-
-function normalizeCombo(combo, dishes) {
-  if (!isComboShape(combo)) {
-    return null;
-  }
-
-  const main = canonicalDishName(combo.main, dishes.mains);
-  const side = canonicalDishName(combo.side, dishes.sides);
-  const dessert = canonicalDishName(combo.dessert, dishes.desserts);
-
-  if (!main || !side || !dessert) {
-    return null;
-  }
-
-  return { main, side, dessert };
 }
 
 function cleanDishArray(items) {
@@ -448,8 +607,9 @@ function cleanDishArray(items) {
 }
 
 function canonicalDishName(rawValue, options) {
+  const safeOptions = Array.isArray(options) ? options : [];
   const normalized = normalizeDishName(rawValue).toLowerCase();
-  for (const option of options) {
+  for (const option of safeOptions) {
     if (option.toLowerCase() === normalized) {
       return option;
     }
@@ -463,19 +623,6 @@ function normalizeDishName(value) {
   }
 
   return value.replace(/\s+/g, " ").trim();
-}
-
-function isComboShape(value) {
-  return (
-    value &&
-    typeof value.main === "string" &&
-    typeof value.side === "string" &&
-    typeof value.dessert === "string"
-  );
-}
-
-function categoryLabel(categoryId) {
-  return CATEGORIES.find((cat) => cat.id === categoryId)?.label.toLowerCase() || "category";
 }
 
 function formatTimestamp(raw) {
@@ -493,7 +640,7 @@ function formatTimestamp(raw) {
 }
 
 function escapeHtml(text) {
-  return text
+  return String(text)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -536,6 +683,17 @@ function randomInt(maxExclusive) {
   }
 
   return Math.floor(Math.random() * maxExclusive);
+}
+
+function clampServings(category, value) {
+  const parsed = Number.parseInt(value, 10);
+  const fallback = category.defaultServings;
+  const safe = Number.isInteger(parsed) ? parsed : fallback;
+  return Math.min(category.maxServings, Math.max(category.minServings, safe));
+}
+
+function categoryById(categoryId) {
+  return CATEGORIES.find((category) => category.id === categoryId) || CATEGORIES[0];
 }
 
 function registerServiceWorker() {

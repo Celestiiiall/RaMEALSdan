@@ -2,9 +2,10 @@
 
 Sufra is a mobile-friendly Ramadan meal picker for:
 
-- Main course
-- Side dish
-- Dessert
+- Main courses
+- Side dishes
+- Desserts
+- Soups
 
 ## No-repeat behavior
 
@@ -13,12 +14,14 @@ Each category has its own no-repeat pool:
 - A selected main course will not repeat until all main courses are used.
 - A selected side dish will not repeat until all side dishes are used.
 - A selected dessert will not repeat until all desserts are used.
+- A selected soup will not repeat until all soups are used.
 
 When a category pool is exhausted, it automatically reshuffles and starts a new cycle.
 
 ## Features
 
 - Add and remove dishes per category
+- Choose how many items you want per category (including 2+ mains/sides/desserts/soups)
 - Persist dishes and history locally (`localStorage`)
 - Generate randomized meal combos
 - Reset all no-repeat pools manually

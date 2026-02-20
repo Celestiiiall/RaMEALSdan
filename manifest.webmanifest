@@ -1,7 +1,7 @@
 {
   "name": "Sufra",
   "short_name": "Sufra",
-  "description": "Pick randomized Ramadan meal combos with no dish repeats until each category pool cycles.",
+  "description": "Pick randomized Ramadan meal combos with adjustable counts across mains, sides, desserts, and soups.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
