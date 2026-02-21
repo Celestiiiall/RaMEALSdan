@@ -69,7 +69,7 @@ const LEGACY_STORAGE_KEYS = [
   "ramealsdan-state-v1",
 ];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v15";
+const SW_VERSION = "v16";
 
 let state = loadState();
 
@@ -80,9 +80,12 @@ const generateBtn = document.getElementById("generate-btn");
 const copyBtn = document.getElementById("copy-btn");
 const resetCycleBtn = document.getElementById("reset-cycle-btn");
 const clearHistoryBtn = document.getElementById("clear-history-btn");
+const shareSaveBtn = document.getElementById("share-save-btn");
+const pasteRestoreBtn = document.getElementById("paste-restore-btn");
 const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
 const importFileInput = document.getElementById("import-file");
+const saveMetaEl = document.getElementById("save-meta");
 
 const outputEls = Object.fromEntries(
   CATEGORIES.map((category) => [category.id, document.getElementById(`output-${category.id}`)]),
@@ -149,6 +152,8 @@ function wireEvents() {
   resetCycleBtn?.addEventListener("click", resetCycle);
   clearHistoryBtn?.addEventListener("click", clearHistory);
 
+  shareSaveBtn?.addEventListener("click", shareOrCopySave);
+  pasteRestoreBtn?.addEventListener("click", restoreFromPaste);
   exportBtn?.addEventListener("click", exportBackup);
   importBtn?.addEventListener("click", () => importFileInput?.click());
 
@@ -177,6 +182,7 @@ function createDefaultState() {
     servings,
     enabled,
     cyclePools,
+    lastSavedAt: null,
     lastCombo: null,
     history: [],
   };
@@ -195,6 +201,7 @@ function loadState() {
     servings: {},
     enabled: {},
     cyclePools: {},
+    lastSavedAt: typeof loadedRaw?.lastSavedAt === "string" ? loadedRaw.lastSavedAt : null,
     lastCombo: null,
     history: [],
   };
@@ -256,7 +263,9 @@ function readPersistedState() {
 }
 
 function saveState() {
+  state.lastSavedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderSaveMeta();
 }
 
 function addDish(categoryId, rawName) {
@@ -476,21 +485,70 @@ function clearHistory() {
   setStatus("History cleared.", "success");
 }
 
-function exportBackup() {
-  const payload = {
+function buildBackupPayload() {
+  return {
     app: APP_NAME,
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     state,
   };
+}
 
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+function buildBackupText(pretty = false) {
+  return JSON.stringify(buildBackupPayload(), null, pretty ? 2 : 0);
+}
+
+function buildBackupFilename() {
+  const stamp = new Date().toISOString().slice(0, 10);
+  return `sufra-backup-${stamp}.json`;
+}
+
+async function shareOrCopySave() {
+  const saveText = buildBackupText();
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: `${APP_NAME} Save`,
+        text: saveText,
+      });
+      setStatus("Save shared.", "success");
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        return;
+      }
+    }
+  }
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard
+      .writeText(saveText)
+      .then(() => setStatus("Save copied. Use Paste Restore on another device.", "success"))
+      .catch(() => setStatus("Could not copy save. Try Save File.", "warn"));
+    return;
+  }
+
+  window.prompt("Copy this save text:", saveText);
+  setStatus("Save shown for manual copy.", "success");
+}
+
+function restoreFromPaste() {
+  const pasted = window.prompt("Paste your Sufra save text here:");
+  if (pasted === null) {
+    return;
+  }
+
+  importStateFromText(pasted, "pasted text");
+}
+
+function exportBackup() {
+  const blob = new Blob([buildBackupText(true)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
-  const stamp = new Date().toISOString().slice(0, 10);
 
   anchor.href = url;
-  anchor.download = `sufra-backup-${stamp}.json`;
+  anchor.download = buildBackupFilename();
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
@@ -506,31 +564,38 @@ function importStateFromFile(file) {
 
   file
     .text()
-    .then((text) => {
-      const parsed = JSON.parse(text);
-      const importedRaw = parsed?.state ?? parsed;
-
-      if (!importedRaw || typeof importedRaw !== "object") {
-        throw new Error("Invalid backup format");
-      }
-
-      const next = createDefaultState();
-      next.dishes = importedRaw.dishes || {};
-      next.servings = importedRaw.servings || {};
-      next.enabled = importedRaw.enabled || {};
-      next.cyclePools = importedRaw.cyclePools || {};
-      next.lastCombo = importedRaw.lastCombo || null;
-      next.history = Array.isArray(importedRaw.history) ? importedRaw.history : [];
-
-      reconcileState(next);
-      state = next;
-      saveState();
-      render();
-      setStatus(`Backup loaded from ${file.name}.`, "success");
-    })
+    .then((text) => importStateFromText(text, file.name))
     .catch(() => {
       setStatus("Could not load backup file.", "warn");
     });
+}
+
+function importStateFromText(text, sourceLabel) {
+  try {
+    const parsed = JSON.parse(text);
+    const importedRaw = parsed?.state ?? parsed;
+
+    if (!importedRaw || typeof importedRaw !== "object") {
+      throw new Error("Invalid backup format");
+    }
+
+    const next = createDefaultState();
+    next.dishes = importedRaw.dishes || {};
+    next.servings = importedRaw.servings || {};
+    next.enabled = importedRaw.enabled || {};
+    next.cyclePools = importedRaw.cyclePools || {};
+    next.lastSavedAt = typeof importedRaw.lastSavedAt === "string" ? importedRaw.lastSavedAt : null;
+    next.lastCombo = importedRaw.lastCombo || null;
+    next.history = Array.isArray(importedRaw.history) ? importedRaw.history : [];
+
+    reconcileState(next);
+    state = next;
+    saveState();
+    render();
+    setStatus(`Save restored from ${sourceLabel}.`, "success");
+  } catch {
+    setStatus("Could not restore save text.", "warn");
+  }
 }
 
 function render() {
@@ -542,6 +607,7 @@ function render() {
 
   renderComboCard();
   renderHistory();
+  renderSaveMeta();
 
   comboStatsEl.textContent = `Before repeat: ${getPoolStats()}`;
 }
@@ -644,6 +710,19 @@ function renderHistory() {
     .join("");
 }
 
+function renderSaveMeta() {
+  if (!saveMetaEl) {
+    return;
+  }
+
+  if (!state.lastSavedAt) {
+    saveMetaEl.textContent = "Auto-save is on for this device.";
+    return;
+  }
+
+  saveMetaEl.textContent = `Auto-saved ${formatTimestamp(state.lastSavedAt)} on this device.`;
+}
+
 function formatHistoryChunk(category, picks) {
   if (!Array.isArray(picks) || picks.length === 0) {
     return "";
@@ -671,6 +750,7 @@ function getPoolStats() {
 
 function reconcileState(target) {
   target.enabled = target.enabled || {};
+  target.lastSavedAt = typeof target.lastSavedAt === "string" ? target.lastSavedAt : null;
 
   for (const category of CATEGORIES) {
     const rawServingValue = target.servings[category.id];

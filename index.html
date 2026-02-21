@@ -9,17 +9,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sufra" />
     <title>Sufra</title>
-    <link rel="manifest" href="manifest.webmanifest?v=15" />
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=15" />
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=15" />
-    <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=15" />
+    <link rel="manifest" href="manifest.webmanifest?v=16" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=16" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=16" />
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=16" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=15" />
+    <link rel="stylesheet" href="styles.css?v=16" />
   </head>
   <body>
     <div class="night-scene" aria-hidden="true">
@@ -141,14 +141,17 @@
       <section class="panel dishes-panel">
         <div class="section-head">
           <h2>Your Dishes</h2>
-          <p class="stats">Auto-saved on this device. You can also save/load backups.</p>
+          <p class="stats">Auto-saved instantly. You can also share and restore saves easily.</p>
         </div>
 
         <div class="actions storage-actions">
-          <button id="export-btn" type="button" class="button secondary">Save Backup</button>
-          <button id="import-btn" type="button" class="button ghost">Load Backup</button>
+          <button id="share-save-btn" type="button" class="button secondary">Share/Copy Save</button>
+          <button id="paste-restore-btn" type="button" class="button ghost">Paste Restore</button>
+          <button id="export-btn" type="button" class="button ghost">Save File</button>
+          <button id="import-btn" type="button" class="button ghost">Load File</button>
           <input id="import-file" type="file" accept="application/json" hidden />
         </div>
+        <p id="save-meta" class="save-meta"></p>
 
         <div class="lists-grid">
           <article class="dish-column">
@@ -237,6 +240,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=15"></script>
+    <script src="app.js?v=16"></script>
   </body>
 </html>

@@ -26,7 +26,8 @@ When a category pool is exhausted, it automatically reshuffles and starts a new 
 - Choose included categories with toggles (main/side/dessert/soup/salad can be on or off)
 - Choose how many items you want per included category (including 2+ mains/sides/desserts/soups/salads)
 - Persist dishes and history locally (`localStorage`, auto-save)
-- Save and load JSON backups
+- Share/copy save text and paste-restore on another device
+- Save and load JSON backup files
 - Generate randomized meal combos
 - Reset all no-repeat pools manually
 - Copy the latest combo text

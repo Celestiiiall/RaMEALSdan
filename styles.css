@@ -344,7 +344,14 @@ h1 {
 
 .storage-actions {
   margin-top: 0;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.save-meta {
+  margin: 0 0 0.8rem;
+  color: var(--ink-soft);
+  font-size: 0.83rem;
+  line-height: 1.35;
 }
 
 .button {
