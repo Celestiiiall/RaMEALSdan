@@ -9,17 +9,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sufra" />
     <title>Sufra</title>
-    <link rel="manifest" href="manifest.webmanifest?v=14" />
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=14" />
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=14" />
-    <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=14" />
+    <link rel="manifest" href="manifest.webmanifest?v=15" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=15" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=15" />
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=15" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=14" />
+    <link rel="stylesheet" href="styles.css?v=15" />
   </head>
   <body>
     <div class="night-scene" aria-hidden="true">
@@ -67,34 +67,65 @@
             <p>Soups</p>
             <h3 id="output-soups">-</h3>
           </article>
+          <article class="combo-card">
+            <p>Salads</p>
+            <h3 id="output-salads">-</h3>
+          </article>
         </div>
 
         <div class="serving-panel">
-          <p class="serving-title">How many from each category?</p>
+          <p class="serving-title">Choose included categories and servings</p>
           <div class="serving-grid">
-            <label class="serving-control" for="count-mains">
-              Main courses
+            <article id="serving-wrap-mains" class="serving-control">
+              <div class="serving-head">
+                <span>Main courses</span>
+                <label class="toggle-label" for="toggle-mains">
+                  <input id="toggle-mains" class="include-toggle" type="checkbox" />
+                  Include
+                </label>
+              </div>
               <input id="count-mains" class="count-input" type="number" min="1" max="6" step="1" />
-            </label>
-            <label class="serving-control" for="count-sides">
-              Side dishes
+            </article>
+            <article id="serving-wrap-sides" class="serving-control">
+              <div class="serving-head">
+                <span>Side dishes</span>
+                <label class="toggle-label" for="toggle-sides">
+                  <input id="toggle-sides" class="include-toggle" type="checkbox" />
+                  Include
+                </label>
+              </div>
               <input id="count-sides" class="count-input" type="number" min="1" max="6" step="1" />
-            </label>
-            <label class="serving-control" for="count-desserts">
-              Desserts
-              <input
-                id="count-desserts"
-                class="count-input"
-                type="number"
-                min="1"
-                max="6"
-                step="1"
-              />
-            </label>
-            <label class="serving-control" for="count-soups">
-              Soups
-              <input id="count-soups" class="count-input" type="number" min="0" max="6" step="1" />
-            </label>
+            </article>
+            <article id="serving-wrap-desserts" class="serving-control">
+              <div class="serving-head">
+                <span>Desserts</span>
+                <label class="toggle-label" for="toggle-desserts">
+                  <input id="toggle-desserts" class="include-toggle" type="checkbox" />
+                  Include
+                </label>
+              </div>
+              <input id="count-desserts" class="count-input" type="number" min="1" max="6" step="1" />
+            </article>
+            <article id="serving-wrap-soups" class="serving-control">
+              <div class="serving-head">
+                <span>Soups</span>
+                <label class="toggle-label" for="toggle-soups">
+                  <input id="toggle-soups" class="include-toggle" type="checkbox" />
+                  Include
+                </label>
+              </div>
+              <input id="count-soups" class="count-input" type="number" min="1" max="6" step="1" />
+            </article>
+            <article id="serving-wrap-salads" class="serving-control">
+              <div class="serving-head">
+                <span>Salads</span>
+                <label class="toggle-label" for="toggle-salads">
+                  <input id="toggle-salads" class="include-toggle" type="checkbox" />
+                  Include
+                </label>
+              </div>
+              <input id="count-salads" class="count-input" type="number" min="1" max="6" step="1" />
+            </article>
           </div>
         </div>
 
@@ -110,7 +141,13 @@
       <section class="panel dishes-panel">
         <div class="section-head">
           <h2>Your Dishes</h2>
-          <p class="stats">Add your own meals for each category, including soups.</p>
+          <p class="stats">Auto-saved on this device. You can also save/load backups.</p>
+        </div>
+
+        <div class="actions storage-actions">
+          <button id="export-btn" type="button" class="button secondary">Save Backup</button>
+          <button id="import-btn" type="button" class="button ghost">Load Backup</button>
+          <input id="import-file" type="file" accept="application/json" hidden />
         </div>
 
         <div class="lists-grid">
@@ -173,6 +210,21 @@
             </form>
             <ul id="list-soups" class="dish-list"></ul>
           </article>
+
+          <article class="dish-column">
+            <h3>Salads</h3>
+            <form id="form-salads" class="dish-form">
+              <input
+                id="input-salads"
+                type="text"
+                placeholder="e.g. Tabbouleh"
+                maxlength="60"
+                autocomplete="off"
+              />
+              <button type="submit" class="button tiny">Add</button>
+            </form>
+            <ul id="list-salads" class="dish-list"></ul>
+          </article>
         </div>
       </section>
 
@@ -185,6 +237,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=14"></script>
+    <script src="app.js?v=15"></script>
   </body>
 </html>

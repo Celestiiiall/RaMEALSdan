@@ -9,6 +9,7 @@ const CATEGORIES = [
     minServings: 1,
     maxServings: 6,
     defaultServings: 1,
+    defaultEnabled: true,
   },
   {
     id: "sides",
@@ -18,6 +19,7 @@ const CATEGORIES = [
     minServings: 1,
     maxServings: 6,
     defaultServings: 1,
+    defaultEnabled: true,
   },
   {
     id: "desserts",
@@ -27,29 +29,47 @@ const CATEGORIES = [
     minServings: 1,
     maxServings: 6,
     defaultServings: 1,
+    defaultEnabled: true,
   },
   {
     id: "soups",
     label: "Soups",
     singular: "soup",
     legacyComboKey: "soup",
-    minServings: 0,
+    minServings: 1,
     maxServings: 6,
     defaultServings: 1,
+    defaultEnabled: false,
+  },
+  {
+    id: "salads",
+    label: "Salads",
+    singular: "salad",
+    legacyComboKey: "salad",
+    minServings: 1,
+    maxServings: 6,
+    defaultServings: 1,
+    defaultEnabled: false,
   },
 ];
 
 const DEFAULT_DISHES = {
   mains: ["Chicken Biryani", "Lamb Kofta", "Mandi Rice"],
-  sides: ["Samosa", "Fattoush Salad", "Garlic Bread"],
+  sides: ["Samosa", "Cheese Sambousek", "Garlic Bread"],
   desserts: ["Kunafa", "Basbousa", "Date Cookies"],
   soups: ["Harira", "Lentil Soup", "Tomato Soup"],
+  salads: ["Tabbouleh", "Cucumber Yogurt Salad", "Beetroot Salad"],
 };
 
-const STORAGE_KEY = "sufra-state-v2";
-const LEGACY_STORAGE_KEYS = ["sufra-state-v1", "iftar-lantern-state-v1", "ramealsdan-state-v1"];
+const STORAGE_KEY = "sufra-state-v3";
+const LEGACY_STORAGE_KEYS = [
+  "sufra-state-v2",
+  "sufra-state-v1",
+  "iftar-lantern-state-v1",
+  "ramealsdan-state-v1",
+];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v14";
+const SW_VERSION = "v15";
 
 let state = loadState();
 
@@ -60,6 +80,9 @@ const generateBtn = document.getElementById("generate-btn");
 const copyBtn = document.getElementById("copy-btn");
 const resetCycleBtn = document.getElementById("reset-cycle-btn");
 const clearHistoryBtn = document.getElementById("clear-history-btn");
+const exportBtn = document.getElementById("export-btn");
+const importBtn = document.getElementById("import-btn");
+const importFileInput = document.getElementById("import-file");
 
 const outputEls = Object.fromEntries(
   CATEGORIES.map((category) => [category.id, document.getElementById(`output-${category.id}`)]),
@@ -67,6 +90,14 @@ const outputEls = Object.fromEntries(
 
 const countInputs = Object.fromEntries(
   CATEGORIES.map((category) => [category.id, document.getElementById(`count-${category.id}`)]),
+);
+
+const toggleInputs = Object.fromEntries(
+  CATEGORIES.map((category) => [category.id, document.getElementById(`toggle-${category.id}`)]),
+);
+
+const servingWrapEls = Object.fromEntries(
+  CATEGORIES.map((category) => [category.id, document.getElementById(`serving-wrap-${category.id}`)]),
 );
 
 wireEvents();
@@ -79,53 +110,72 @@ function wireEvents() {
     const input = document.getElementById(`input-${category.id}`);
     const list = document.getElementById(`list-${category.id}`);
     const countInput = countInputs[category.id];
+    const toggleInput = toggleInputs[category.id];
 
-    if (!form || !input || !list || !countInput) {
-      continue;
+    if (form && input && list) {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        addDish(category.id, input.value);
+        input.value = "";
+        input.focus();
+      });
+
+      list.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-index]");
+        if (!button) {
+          return;
+        }
+
+        const index = Number(button.dataset.index);
+        removeDish(category.id, index);
+      });
     }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      addDish(category.id, input.value);
-      input.value = "";
-      input.focus();
-    });
+    if (countInput) {
+      countInput.addEventListener("change", () => {
+        updateServings(category.id, countInput.value);
+      });
+    }
 
-    list.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-index]");
-      if (!button) {
-        return;
-      }
-
-      const index = Number(button.dataset.index);
-      removeDish(category.id, index);
-    });
-
-    countInput.addEventListener("change", () => {
-      updateServings(category.id, countInput.value);
-    });
+    if (toggleInput) {
+      toggleInput.addEventListener("change", () => {
+        updateCategoryEnabled(category.id, toggleInput.checked);
+      });
+    }
   }
 
-  generateBtn.addEventListener("click", generateCombo);
-  copyBtn.addEventListener("click", copyCombo);
-  resetCycleBtn.addEventListener("click", resetCycle);
-  clearHistoryBtn.addEventListener("click", clearHistory);
+  generateBtn?.addEventListener("click", generateCombo);
+  copyBtn?.addEventListener("click", copyCombo);
+  resetCycleBtn?.addEventListener("click", resetCycle);
+  clearHistoryBtn?.addEventListener("click", clearHistory);
+
+  exportBtn?.addEventListener("click", exportBackup);
+  importBtn?.addEventListener("click", () => importFileInput?.click());
+
+  importFileInput?.addEventListener("change", () => {
+    const [file] = importFileInput.files || [];
+    importStateFromFile(file);
+    importFileInput.value = "";
+  });
 }
 
 function createDefaultState() {
   const dishes = {};
   const servings = {};
+  const enabled = {};
   const cyclePools = {};
 
   for (const category of CATEGORIES) {
     dishes[category.id] = [...DEFAULT_DISHES[category.id]];
     servings[category.id] = category.defaultServings;
+    enabled[category.id] = category.defaultEnabled;
     cyclePools[category.id] = makeShuffledPool(dishes[category.id]);
   }
 
   return {
     dishes,
     servings,
+    enabled,
     cyclePools,
     lastCombo: null,
     history: [],
@@ -143,6 +193,7 @@ function loadState() {
     ...defaultState,
     dishes: {},
     servings: {},
+    enabled: {},
     cyclePools: {},
     lastCombo: null,
     history: [],
@@ -156,6 +207,16 @@ function loadState() {
 
     const candidateServings = loadedRaw?.servings?.[category.id];
     loaded.servings[category.id] = clampServings(category, candidateServings);
+
+    const candidateEnabled = loadedRaw?.enabled?.[category.id];
+    if (typeof candidateEnabled === "boolean") {
+      loaded.enabled[category.id] = candidateEnabled;
+    } else {
+      const parsedServings = Number.parseInt(candidateServings, 10);
+      loaded.enabled[category.id] = Number.isInteger(parsedServings)
+        ? parsedServings > 0
+        : category.defaultEnabled;
+    }
 
     const candidatePool = loadedRaw?.cyclePools?.[category.id];
     loaded.cyclePools[category.id] = Array.isArray(candidatePool)
@@ -205,9 +266,7 @@ function addDish(categoryId, rawName) {
     return;
   }
 
-  const exists = state.dishes[categoryId].some(
-    (dish) => dish.toLowerCase() === name.toLowerCase(),
-  );
+  const exists = state.dishes[categoryId].some((dish) => dish.toLowerCase() === name.toLowerCase());
   if (exists) {
     setStatus(`"${name}" is already in ${categoryById(categoryId).label.toLowerCase()}.`, "warn");
     return;
@@ -254,8 +313,37 @@ function updateServings(categoryId, rawValue) {
   setStatus(`Set ${nextValue} ${noun} per combo.`, "success");
 }
 
+function updateCategoryEnabled(categoryId, enabled) {
+  state.enabled[categoryId] = Boolean(enabled);
+
+  if (state.enabled[categoryId] && state.servings[categoryId] < categoryById(categoryId).minServings) {
+    state.servings[categoryId] = categoryById(categoryId).defaultServings;
+  }
+
+  if (!state.enabled[categoryId] && state.lastCombo) {
+    state.lastCombo[categoryId] = [];
+  }
+
+  saveState();
+  render();
+
+  const action = state.enabled[categoryId] ? "included" : "excluded";
+  setStatus(`${categoryById(categoryId).label} ${action} in combos.`, "success");
+}
+
 function generateCombo() {
-  const required = CATEGORIES.filter((category) => state.servings[category.id] > 0);
+  const activeCategories = CATEGORIES.filter((category) => state.enabled[category.id]);
+  if (activeCategories.length === 0) {
+    setStatus("Enable at least one category first.", "warn");
+    return;
+  }
+
+  const required = activeCategories.filter((category) => state.servings[category.id] > 0);
+  if (required.length === 0) {
+    setStatus("Set servings for at least one enabled category.", "warn");
+    return;
+  }
+
   const missing = required
     .filter((category) => state.dishes[category.id].length === 0)
     .map((category) => category.label);
@@ -269,6 +357,11 @@ function generateCombo() {
   const combo = {};
 
   for (const category of CATEGORIES) {
+    if (!state.enabled[category.id] || state.servings[category.id] <= 0) {
+      combo[category.id] = [];
+      continue;
+    }
+
     const desiredCount = state.servings[category.id];
     combo[category.id] = drawDishesForCategory(category.id, desiredCount, restartedPools);
   }
@@ -383,10 +476,68 @@ function clearHistory() {
   setStatus("History cleared.", "success");
 }
 
+function exportBackup() {
+  const payload = {
+    app: APP_NAME,
+    version: 3,
+    exportedAt: new Date().toISOString(),
+    state,
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  anchor.href = url;
+  anchor.download = `sufra-backup-${stamp}.json`;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+
+  URL.revokeObjectURL(url);
+  setStatus("Backup file saved.", "success");
+}
+
+function importStateFromFile(file) {
+  if (!file) {
+    return;
+  }
+
+  file
+    .text()
+    .then((text) => {
+      const parsed = JSON.parse(text);
+      const importedRaw = parsed?.state ?? parsed;
+
+      if (!importedRaw || typeof importedRaw !== "object") {
+        throw new Error("Invalid backup format");
+      }
+
+      const next = createDefaultState();
+      next.dishes = importedRaw.dishes || {};
+      next.servings = importedRaw.servings || {};
+      next.enabled = importedRaw.enabled || {};
+      next.cyclePools = importedRaw.cyclePools || {};
+      next.lastCombo = importedRaw.lastCombo || null;
+      next.history = Array.isArray(importedRaw.history) ? importedRaw.history : [];
+
+      reconcileState(next);
+      state = next;
+      saveState();
+      render();
+      setStatus(`Backup loaded from ${file.name}.`, "success");
+    })
+    .catch(() => {
+      setStatus("Could not load backup file.", "warn");
+    });
+}
+
 function render() {
   for (const category of CATEGORIES) {
     renderCategoryList(category.id);
     renderServingInput(category.id);
+    renderCategoryToggle(category.id);
   }
 
   renderComboCard();
@@ -399,6 +550,10 @@ function renderCategoryList(categoryId) {
   const listEl = document.getElementById(`list-${categoryId}`);
   const items = state.dishes[categoryId];
 
+  if (!listEl) {
+    return;
+  }
+
   if (items.length === 0) {
     listEl.innerHTML = '<li class="empty">No dishes yet.</li>';
     return;
@@ -409,9 +564,7 @@ function renderCategoryList(categoryId) {
       (dish, index) => `
         <li class="dish-item">
           <span>${escapeHtml(dish)}</span>
-          <button class="remove-btn" data-index="${index}" aria-label="Remove ${escapeHtml(
-            dish,
-          )}">
+          <button class="remove-btn" data-index="${index}" aria-label="Remove ${escapeHtml(dish)}">
             Remove
           </button>
         </li>
@@ -422,10 +575,26 @@ function renderCategoryList(categoryId) {
 
 function renderServingInput(categoryId) {
   const input = countInputs[categoryId];
+  const wrap = servingWrapEls[categoryId];
   if (!input) {
     return;
   }
+
   input.value = String(state.servings[categoryId]);
+
+  const enabled = Boolean(state.enabled[categoryId]);
+  input.disabled = !enabled;
+  input.setAttribute("aria-disabled", String(!enabled));
+  wrap?.classList.toggle("disabled", !enabled);
+}
+
+function renderCategoryToggle(categoryId) {
+  const toggle = toggleInputs[categoryId];
+  if (!toggle) {
+    return;
+  }
+
+  toggle.checked = Boolean(state.enabled[categoryId]);
 }
 
 function renderComboCard() {
@@ -434,10 +603,15 @@ function renderComboCard() {
     if (!outputEl) {
       continue;
     }
-    const picks = state.lastCombo?.[category.id] || [];
 
+    if (!state.enabled[category.id]) {
+      outputEl.textContent = "Not included";
+      continue;
+    }
+
+    const picks = state.lastCombo?.[category.id] || [];
     if (picks.length === 0) {
-      outputEl.textContent = state.servings[category.id] === 0 ? "Not included" : "-";
+      outputEl.textContent = "-";
       continue;
     }
 
@@ -454,13 +628,15 @@ function renderHistory() {
   historyListEl.innerHTML = state.history
     .map((entry) => {
       const timestamp = formatTimestamp(entry.at);
-      const parts = CATEGORIES
-        .map((category) => formatHistoryChunk(category, entry[category.id] || []))
-        .filter((chunk) => chunk !== "");
+      const parts = CATEGORIES.map((category) => formatHistoryChunk(category, entry[category.id] || [])).filter(
+        (chunk) => chunk !== "",
+      );
+
+      const body = parts.length > 0 ? parts.join('<span class="history-sep"> | </span>') : "No picks";
 
       return `
         <li class="history-entry">
-          ${parts.join('<span class="history-sep"> | </span>')}
+          ${body}
           <span class="history-meta">${timestamp}</span>
         </li>
       `;
@@ -484,21 +660,34 @@ function setStatus(message, tone = "") {
 }
 
 function getPoolStats() {
-  return CATEGORIES.map((category) => `${category.singular} ${state.cyclePools[category.id].length}`).join(
-    ", ",
-  );
+  return CATEGORIES.map((category) => {
+    if (!state.enabled[category.id]) {
+      return `${category.singular} off`;
+    }
+
+    return `${category.singular} ${state.cyclePools[category.id].length}`;
+  }).join(", ");
 }
 
 function reconcileState(target) {
+  target.enabled = target.enabled || {};
+
   for (const category of CATEGORIES) {
+    const rawServingValue = target.servings[category.id];
     target.dishes[category.id] = cleanDishArray(target.dishes[category.id] || []);
-    target.servings[category.id] = clampServings(category, target.servings[category.id]);
+
+    if (typeof target.enabled[category.id] !== "boolean") {
+      const parsedServings = Number.parseInt(rawServingValue, 10);
+      target.enabled[category.id] = Number.isInteger(parsedServings)
+        ? parsedServings > 0
+        : category.defaultEnabled;
+    }
+
+    target.servings[category.id] = clampServings(category, rawServingValue);
   }
 
   for (const category of CATEGORIES) {
-    const currentPool = Array.isArray(target.cyclePools?.[category.id])
-      ? target.cyclePools[category.id]
-      : [];
+    const currentPool = Array.isArray(target.cyclePools?.[category.id]) ? target.cyclePools[category.id] : [];
 
     target.cyclePools[category.id] = normalizePool(currentPool, target.dishes[category.id]);
     if (target.cyclePools[category.id].length === 0 && target.dishes[category.id].length > 0) {
