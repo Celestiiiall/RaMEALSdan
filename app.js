@@ -69,11 +69,10 @@ const LEGACY_STORAGE_KEYS = [
   "ramealsdan-state-v1",
 ];
 const MAX_HISTORY = 30;
-const SW_VERSION = "v16";
+const SW_VERSION = "v17";
 
 let state = loadState();
 
-const comboStatsEl = document.getElementById("combo-stats");
 const statusEl = document.getElementById("status");
 const historyListEl = document.getElementById("history-list");
 const generateBtn = document.getElementById("generate-btn");
@@ -608,8 +607,6 @@ function render() {
   renderComboCard();
   renderHistory();
   renderSaveMeta();
-
-  comboStatsEl.textContent = `Before repeat: ${getPoolStats()}`;
 }
 
 function renderCategoryList(categoryId) {
